@@ -1,0 +1,229 @@
+---
+title: 'Analytics Bootcamp'
+subtitle: "Local Regression, Introduction"
+date: "Friday, October 19, 2018"
+output: 
+    html_document:
+        keep_md: true
+        toc: true
+        toc_depth: 2
+        number_sections: true
+        theme: cerulean
+        toc_float: true
+---
+
+```{r setup, include=FALSE}
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(knitr))
+opts_chunk$set(fig.width=5, fig.height=3, fig.align="center",
+               warning=FALSE)
+my_accent <- "#d95f02"
+rotate_y <- theme(axis.title.y=element_text(angle=0, vjust=0.5))
+```
+
+
+# Overview
+
+In today's class, we'll discuss:
+
+- About me, you, the course, and such.
+- What machine learning is, beginning with a simple model. 
+
+# About
+
+## About me
+
+A data scientist and teaching assistant at UBC for the MBA, Supply Chain Analytics course. My background:
+
+- Bachelor of Technology in Computer Science & Engineering
+-Master in Business Analytics
+-Decision Scientist, Mu Sigma
+-Analytical Consultant, Boeing Vancouver
+-Co-founder, Cleo
+
+
+Computationally, I am primarily an R programmer. I'm a basic python user.
+
+Lots of experience as a statistical consultant for businesses. 
+
+## About the TA's
+
+This course has one TA.
+
+- Arya, she loves google.
+
+You'll see them in class and office hours. 
+
+## About you
+
+Introduce yourself! Let's hear about:
+
+- Your name
+- Why Analytics?
+- Something about yourself.
+
+## About this course
+
+This is an introductory course! You can expect things to evolve as we progress.
+
+- Preview of the course website -- it contains all materials related to the course.
+- Preview of the syllabus
+
+Before we talk more about the assessments, let's first talk about the structure of our class meetings. 
+
+## About class meetings
+
+I intend most class meetings to take the __listen-do-listen-do__ form:
+
+1. __Listen__: (15 min?) I'll start class meetings with high-level explanations of a topic.
+2. __Do__: (40 min?) You do hands-on exploratory work to allow you to build concepts.
+    - You "present" your work to initiate a class discussion; I clarify concepts as needed.
+3. __Listen__: (25 min?) Once you have basic concepts down pat, I'll talk more about details. Maybe iterate back to 1 with another topic. 
+4. __Do__: (40 min?) Open time for working on course material, typically assignments or in-class material. Instructor and a TA will be present to answer questions. 
+
+Notes:
+
+- This structure might evolve as the course progresses. 
+- There will be a TA present to help you.
+- In-class exercises will typically contain toy data sets; assignments will be more "real".
+
+# Local machine learning methods
+
+Let's turn our attention to the first "new" machine learning methods : $k$ __Nearest Neighbours__ (aka kNN or $k$-NN) and __loess__ (aka "LOcal regrESSion").
+
+The fundamental idea behind these methods is to _base your prediction on what happened in similar cases in the past_.
+
+## kNN
+
+Pick a positive integer $k$. 
+
+To make a prediction of the response at a particular observation of the predictors (I'll call this the __query point__) -- that is, when $X_1=x_1$, ..., $X_p=x_p$:
+
+1. Subset your data to $k$ observations (rows) whose values of the predictors $(X_1, \ldots, X_p)$ are closest to $(x_1,\ldots,x_p)$.
+2. For kNN classificiation, use the "most popular vote" (i.e., the modal category) of the subsetted observations. For kNN regression, use the average $Y$ of the remaining subsetted observations.
+
+Recall how to calculate distance between two vectors $(a_1, \ldots, a_p)$ and $(b_1, \ldots, b_p)$:
+$$ \text{distance} = \sqrt{(a_1-b_1)^2 + \cdots + (a_p-b_p)^2}. $$
+It's even easier when there's one predictor: it's just the absolute value of the difference. 
+
+## loess
+
+(This is actually the simplest version of loess, sometimes called a __moving window__ approach. We'll get to the "full" loess).
+
+Pick a positive number $r$ (not necessarily integer). 
+
+To make a prediction of the response at a query point (that is, a particular observation of the predictors, $X_1=x_1$, ..., $X_p=x_p$):
+
+1. Subset your data to those observations (rows) having values of the predictors $(X_1,\ldots,X_p)$ within $r$ units of $(x_1,\ldots,x_p)$.
+2. For kNN classificiation, use the "most popular vote" (i.e., the modal category) of the subsetted observations. For kNN regression, use the average $Y$ of the remaining subsetted observations.
+
+Notice that Step 2 is the same as in kNN.
+
+$k$ and $r$ are called __hyperparameters__, because we don't estimate them -- we choose them outright.
+
+# In-Class Exercises
+
+Consider the following data set, given by `dat`. Here's the top six rows of data:
+
+```{r, echo=TRUE}
+set.seed(87)
+dat <- tibble(x = c(rnorm(100), rnorm(100)+5)-3,
+              y = sin(x^2/5)/x + rnorm(200)/10 + exp(1))
+kable(head(dat))
+```
+
+Here's a scatterplot of the data:
+
+```{r}
+ggplot(dat, aes(x,y)) + 
+    geom_point(colour=my_accent) +
+    theme_bw() + 
+    rotate_y
+```
+
+## Exercise 1: Mean at $X=0$
+
+Let's check your understanding of loess and kNN. Consider estimating the mean of $Y$ when $X=0$ by using data whose $X$ values are near 0. 
+
+1. Eyeball the above scatterplot of the data. What would you say is a reasonable estimate of the mean of $Y$ at $X=0$? Why?
+
+> The data seem to be centered around approximately 2.7. 
+2. Estimate using loess and kNN (you choose the hyperparameters).
+    1. Hints for kNN:
+        - First, add a new column in the data that stores the _distance_ between $X=0$ and each observation. If that column is named `d`, you can do this with the following partial code: `dat$d <- YOUR_CALCULATION_HERE`. Recall that `dat$x` is a vector of the `x` column.
+        - Then, arrange the data from smallest distance to largest with `arrange(dat)` (you'll need to load the `tidyverse` package first), and subset _that_ to the first $k$ rows. 
+    2. Hints for loess:
+        - Subset the data using the `filter` function. The condition to filter on: you want to keep rows whose distances (`d`) are ...
+        
+```{r}
+k <- 10
+r <- 0.5
+dat %>% 
+    mutate(d = abs(x-0)) %>% 
+    arrange(d) %>% 
+    summarize(kNN=mean(y[1:k]),
+              loess=mean(y[d<r])) %>% 
+    kable
+```
+
+3. What happens when you try to pick an $r$ that is way too small? Say, $r=0.01$? Why?
+
+> There will be no prediction, because there will be no data in the window. Here's the data that result after subsetting:
+```{r}
+r <- 0.01
+dat %>% 
+    mutate(d = abs(x-0)) %>% 
+    filter(d<r)
+```
+
+
+4. There's a tradeoff between choosing large and small values of either hyperparameter. What's good and what's bad about choosing a large value? What about small values?
+
+> Large values of k or r will result in a prediction with low variance, but high bias; and vice-versa for smaller values of k and r.
+## Exercise 2: Regression Curve
+
+Instead of estimating the mean just at $X=0$, we'd like to do the same procedure, but for "all" $X$ values, keeping the hyperparameter fixed. Because we can't actually do this for all $X$ values, let's choose a grid of 1000 $X$ values between -5 and 4 using the code `seq(-5, 4, length.out=1000)`.
+
+__Questions for discussion__:
+
+- Go ahead and do the estimation using both methods, and plot the mean estimates for each $X$ on top of the scatterplot in a different colour, connecting the dots to form a __regression curve__. I'll give you some of the code -- just fill in your code for the kNN and loess exercise from before:
+
+```{r}
+library(tidyverse)
+xgrid <- seq(-5, 4, length.out=1000)
+k <- 10
+r <- 0.5
+kNN_estimates <- map_dbl(xgrid, function(x_){
+    dat %>% 
+        mutate(d = abs(x-x_)) %>% 
+        arrange(d) %>% 
+        summarize(yhat=mean(y[1:k])) %>% 
+        `[[`("yhat")
+})
+loess_estimates <- map_dbl(xgrid, function(x_){
+    dat %>% 
+        mutate(d = abs(x-x_)) %>% 
+        filter(d<r) %>% 
+        summarize(yhat=mean(y)) %>% 
+        `[[`("yhat")
+})
+est <- tibble(x=xgrid, kNN=kNN_estimates, loess=loess_estimates) %>% 
+    gather(key="method", value="estimate", kNN, loess)
+ggplot() +
+    geom_point(data=dat, mapping=aes(x,y)) +
+    geom_line(data=est, 
+              mapping=aes(x,estimate, group=method, colour=method),
+              size=1) +
+    theme_bw()
+```
+
+- Play with different values of $k$ and $r$, and regenerate the plot each time. What effect does increasing these values have on the regression curve? What about decreasing? What would you say is a "good" choice of $k$ and $r$, and why?
+- What happens when you choose $k=n=200$? What happens if you choose $r=10$ or bigger?
+
+
+## Food for Thought
+
+The phenomenon you see when $k$ and $r$ are very small is called __overfitting__. This means that your model displays patterns that are not actually present. __Underfitting__, on the other hand, is when your model misses patterns in the data that are actually present.
+
+
+
