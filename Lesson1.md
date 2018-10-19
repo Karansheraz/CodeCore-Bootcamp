@@ -29,10 +29,10 @@ In today's class, we'll discuss:
 A data scientist and teaching assistant at UBC for the MBA, Supply Chain Analytics course. My background:
 
 - Bachelor of Technology in Computer Science & Engineering
--Master in Business Analytics
--Decision Scientist, Mu Sigma
--Analytical Consultant, Boeing Vancouver
--Co-founder, Cleo
+- Master in Business Analytics
+- Decision Scientist, Mu Sigma
+- Analytical Consultant, Boeing Vancouver
+- Co-founder, Cleo
 
 
 Computationally, I am primarily an R programmer. I'm a basic python user.
