@@ -177,9 +177,6 @@ dat %>%
 ```
 
 
-4. There's a tradeoff between choosing large and small values of either hyperparameter. What's good and what's bad about choosing a large value? What about small values?
-
-> Large values of k or r will result in a prediction with low variance, but high bias; and vice-versa for smaller values of k and r.
 ## Exercise 2: Regression Curve
 
 Instead of estimating the mean just at $X=0$, we'd like to do the same procedure, but for "all" $X$ values, keeping the hyperparameter fixed. Because we can't actually do this for all $X$ values, let's choose a grid of 1000 $X$ values between -5 and 4 using the code `seq(-5, 4, length.out=1000)`.

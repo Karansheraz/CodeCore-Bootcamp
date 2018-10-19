@@ -408,12 +408,9 @@ dat %&gt;%
     filter(d&lt;r)</code></pre>
 <pre><code>## # A tibble: 0 x 3
 ## # ... with 3 variables: x &lt;dbl&gt;, y &lt;dbl&gt;, d &lt;dbl&gt;</code></pre>
-<ol start="4" style="list-style-type: decimal">
-<li>There’s a tradeoff between choosing large and small values of either hyperparameter. What’s good and what’s bad about choosing a large value? What about small values?</li>
-</ol>
-<blockquote>
-<p>Large values of k or r will result in a prediction with low variance, but high bias; and vice-versa for smaller values of k and r. ## Exercise 2: Regression Curve</p>
-</blockquote>
+</div>
+<div id="exercise-2-regression-curve" class="section level2">
+<h2><span class="header-section-number">4.2</span> Exercise 2: Regression Curve</h2>
 <p>Instead of estimating the mean just at <span class="math inline">\(X=0\)</span>, we’d like to do the same procedure, but for “all” <span class="math inline">\(X\)</span> values, keeping the hyperparameter fixed. Because we can’t actually do this for all <span class="math inline">\(X\)</span> values, let’s choose a grid of 1000 <span class="math inline">\(X\)</span> values between -5 and 4 using the code <code>seq(-5, 4, length.out=1000)</code>.</p>
 <p><strong>Questions for discussion</strong>:</p>
 <ul>
@@ -452,7 +449,7 @@ ggplot() +
 </ul>
 </div>
 <div id="food-for-thought" class="section level2">
-<h2><span class="header-section-number">4.2</span> Food for Thought</h2>
+<h2><span class="header-section-number">4.3</span> Food for Thought</h2>
 <p>The phenomenon you see when <span class="math inline">\(k\)</span> and <span class="math inline">\(r\)</span> are very small is called <strong>overfitting</strong>. This means that your model displays patterns that are not actually present. <strong>Underfitting</strong>, on the other hand, is when your model misses patterns in the data that are actually present.</p>
 </div>
 </div>
